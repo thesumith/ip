@@ -19,6 +19,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       text-align: center;
+      max-width: 400px;
     }
     h1 {
       font-size: 1.8rem;
@@ -29,6 +30,27 @@
       font-size: 1.4rem;
       font-weight: bold;
       color: #0077cc;
+      margin: 1rem 0;
+    }
+    .btn {
+      background: #0077cc;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      margin: 0.3rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #005fa3;
+    }
+    .success {
+      color: green;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: none;
     }
   </style>
 </head>
@@ -36,18 +58,37 @@
   <div class="card">
     <h1>Your IP Address</h1>
     <p id="ip">Fetching...</p>
+    <button class="btn" onclick="getIP()">🔄 Refresh</button>
+    <button class="btn" onclick="copyIP()">📋 Copy</button>
+    <p id="copiedMsg" class="success">Copied!</p>
   </div>
 
   <script>
-    fetch("https://api.ipify.org?format=json")
-      .then(response => response.json())
-      .then(data => {
+    async function getIP() {
+      document.getElementById("ip").textContent = "Fetching...";
+      try {
+        let response = await fetch("https://api.ipify.org?format=json");
+        let data = await response.json();
         document.getElementById("ip").textContent = data.ip;
-      })
-      .catch(error => {
+      } catch (error) {
         document.getElementById("ip").textContent = "Error fetching IP";
         console.error("Error:", error);
-      });
+      }
+    }
+
+    function copyIP() {
+      let ipText = document.getElementById("ip").textContent;
+      if (ipText && ipText !== "Fetching..." && ipText !== "Error fetching IP") {
+        navigator.clipboard.writeText(ipText).then(() => {
+          let msg = document.getElementById("copiedMsg");
+          msg.style.display = "block";
+          setTimeout(() => { msg.style.display = "none"; }, 2000);
+        });
+      }
+    }
+
+    // Fetch IP on page load
+    getIP();
   </script>
 </body>
 </html>
